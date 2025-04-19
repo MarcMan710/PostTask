@@ -1,21 +1,23 @@
-// routes/taskRoutes.js
-import express from 'express';
-import {
+const express = require('express')
+const router = express.Router()
+const { protect } = require('../middleware/authMiddleware')
+const {
   getTasks,
-  createTaskHandler,
-  updateTaskHandler,
-  deleteTaskHandler,
-} from '../controllers/taskController.js';
+  createTask,
+  updateTask,
+  getTask,
+  deleteTask,
+} = require('../controllers/taskController');
 
-import { authenticateToken } from '../middleware/authMiddleware.js';
+// Protect all routes in this file
+router.use(protect);
 
-const router = express.Router();
+router.route('/')
+  .get(getTasks)
+  .post(createTask);
+router.route('/:id')
+  .get(getTask)
+  .put(updateTask)
+  .delete(deleteTask);
 
-router.use(authenticateToken);  // All routes below require authentication
-
-router.get('/', getTasks);                           // GET /api/tasks
-router.post('/', createTaskHandler);                 // POST /api/tasks
-router.put('/:id', updateTaskHandler);               // PUT /api/tasks/:id
-router.delete('/:id', deleteTaskHandler);            // DELETE /api/tasks/:id
-
-export default router;
+module.exports = router

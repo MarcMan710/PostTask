@@ -1,49 +1,102 @@
-// controllers/taskController.js
-import {
-  getTasksByUserId,
-  getTaskById,
+const {
+  getUserTasks,
   createTask,
+  getTaskById,
   updateTask,
   deleteTask,
-} from '../models/taskModel.js';
+} = require('../models/taskModel')
 
-export const getTasks = async (req, res) => {
+const getTasks = async (req, res, next) => {
   try {
-    const tasks = await getTasksByUserId(req.user.id);
-    res.json(tasks);
+    const tasks = await getUserTasks(req.user.id)
+    res.status(200).json(tasks)
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch tasks', error: err.message });
+    next(err)
   }
-};
+}
 
-export const createTaskHandler = async (req, res) => {
-  const { title, description, dueDate, priority } = req.body;
+const getTask = async (req, res, next) => {
+  const taskId = req.params.id
   try {
-    const task = await createTask(req.user.id, title, description, dueDate, priority);
-    res.status(201).json(task);
+    const task = await getTaskById(taskId)
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' })
+    }
+    res.status(200).json(task)
   } catch (err) {
-    res.status(500).json({ message: 'Failed to create task', error: err.message });
+    next(err)
   }
-};
 
-export const updateTaskHandler = async (req, res) => {
-  const { id } = req.params;
-  const updates = req.body;
-  try {
-    const updatedTask = await updateTask(id, req.user.id, updates);
-    if (!updatedTask) return res.status(404).json({ message: 'Task not found' });
-    res.json(updatedTask);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to update task', error: err.message });
-  }
-};
+}
 
-export const deleteTaskHandler = async (req, res) => {
-  const { id } = req.params;
+const createTaskHandler = async (req, res, next) => {
+  const { title, description, dueDate, priority } = req.body
+
   try {
-    await deleteTask(id, req.user.id);
-    res.json({ message: 'Task deleted' });
+    if (!title) {
+      return res.status(400).json({ message: 'Title is required' })
+    }
+
+    const task = await createTask({
+      title,
+      description,
+      dueDate,
+      priority,
+      userId: req.user.id,
+    })
+
+    res.status(201).json(task)
   } catch (err) {
-    res.status(500).json({ message: 'Failed to delete task', error: err.message });
+    next(err)
   }
-};
+}
+
+const updateTaskHandler = async (req, res, next) => {
+  const taskId = req.params.id
+  const { title, description, dueDate, priority, status } = req.body
+
+  try {
+    const existingTask = await getTaskById(taskId)
+
+    if (!existingTask) {
+      return res.status(404).json({ message: 'Task not found' })
+    }
+
+    const updated = await updateTask(taskId, {
+      title,
+      description,
+      dueDate,
+      priority,
+      status,
+    })
+
+    res.status(200).json(updated)
+  } catch (err) {
+    next(err)
+  }
+}
+
+const deleteTaskHandler = async (req, res, next) => {
+  const taskId = req.params.id
+
+  try {
+    const existingTask = await getTaskById(taskId)
+
+    if (!existingTask) {
+      return res.status(404).json({ message: 'Task not found' })
+    }
+
+    await deleteTask(taskId)
+    res.status(204).end()
+  } catch (err) {
+    next(err)
+  }
+}
+
+module.exports = {
+  getTasks,
+  getTask,
+  createTask: createTaskHandler,
+  updateTask: updateTaskHandler,
+  deleteTask: deleteTaskHandler,
+}

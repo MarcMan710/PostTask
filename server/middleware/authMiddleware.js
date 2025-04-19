@@ -1,20 +1,36 @@
-// middleware/authMiddleware.js
-import { verifyToken } from '../utils/jwt.js';
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-export const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+/**
+ * Middleware to protect routes by verifying JWT tokens.
+ * @param {object} req - The request object.
+ * @param {object} res - The response object.
+ * @param {function} next - The next middleware function.
+ * @returns {object} - Returns a response object with an error message if authentication fails.
+ * @throws {Error} - Throws an error if JWT_SECRET is not defined.
+ */
+const protect = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({ message: 'Access token missing' });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Unauthorized: No token provided' });
   }
 
-  const decoded = verifyToken(token);
+  const token = authHeader.split(' ')[1];
 
-  if (!decoded) {
-    return res.status(403).json({ message: 'Invalid or expired token' });
+  try {
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not defined in environment variables.');
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // contains { id: userId }
+    next();
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Unauthorized: Token expired' });
+    }
+    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
   }
-
-  req.user = decoded; // { id, username } — or whatever you encoded
-  next();
 };
+
+module.exports = { protect };

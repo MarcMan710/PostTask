@@ -1,18 +1,29 @@
-// models/userModel.js
-import pool from '../db/index.js';
+const db = require('../config/db');
+const formatError = require('../utils/formatError');
 
-export const findUserByUsername = async (username) => {
-  const result = await pool.query(
-    'SELECT * FROM users WHERE username = $1',
-    [username]
-  );
-  return result.rows[0];
-};
+// Register a new user
+async function createUser(email, hashedPassword) {
+  const query = `INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *`;
+  const values = [email, hashedPassword];
+  try {
+    const { rows } = await db.query(query, values);
+    return rows[0];
+  } catch (error) {
+    const formattedError = formatError(error);
+    throw new Error(`Error creating user: ${formattedError.message}`);
+  }
+}
 
-export const createUser = async (username, hashedPassword) => {
-  const result = await pool.query(
-    'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *',
-    [username, hashedPassword]
-  );
-  return result.rows[0];
-};
+// Find user by email
+async function findUserByEmail(email) {
+  const query = `SELECT * FROM users WHERE email = $1`;
+  try {
+    const { rows } = await db.query(query, [email]);
+    return rows[0];
+  } catch (error) {
+    const formattedError = formatError(error);
+    throw new Error(`Error finding user: ${formattedError.message}`);
+  }
+}
+
+module.exports = { createUser, findUserByEmail };
