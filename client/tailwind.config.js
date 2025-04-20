@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
+  darkMode: 'class', // 👈 Required for class-based toggling
+    content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
@@ -14,5 +15,4 @@ export default {
       },
     },
   },
-  plugins: [],
-};
+  plugins: [],};
