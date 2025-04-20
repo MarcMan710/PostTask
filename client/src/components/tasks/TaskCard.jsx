@@ -1,6 +1,6 @@
 import Button from '../common/Button'
 
-const TaskCard = ({ task, onEdit, onDelete }) => {
+const TaskCard = ({ task, onEdit, onDelete }) => {  
   const handleEdit = () => {
     onEdit(task)
   }
@@ -14,6 +14,12 @@ const TaskCard = ({ task, onEdit, onDelete }) => {
       <div>
         <h3 className="font-semibold">{task.title}</h3>
         <p className="text-sm text-gray-600">{task.description}</p>
+        {/* NEW: Display due date */}
+        {task.dueDate && (
+          <p className="text-sm text-gray-500">
+            Due: {new Date(task.dueDate).toLocaleDateString()}
+          </p>
+        )}
       </div>
       <div className="flex gap-2">
         <Button onClick={handleEdit} className="bg-blue-500 hover:bg-blue-600">Edit</Button>
