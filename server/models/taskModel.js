@@ -36,19 +36,20 @@ async function createTask(task) {
 }
 
 // Update task
-async function updateTask(taskId, updates) {
-  const { title, description, dueDate, priority, status, userId } = updates
+async function updateTask(taskId, userId, updates) {
+  const { title, description, dueDate, priority, status, category } = updates;
   const query = `
   UPDATE tasks 
-  SET title = $1, description = $2, due_date = $3, priority = $4, status = $5 
-  WHERE id = $6 AND user_id = $7
+  SET title = $1, description = $2, due_date = $3, priority = $4, status = $5, category = $6
+  WHERE id = $7 AND user_id = $8
   RETURNING *
   `;
 
 
-  const values = [title, description, dueDate, priority, status, taskId];
+  const values = [title, description, dueDate, priority, status, category, taskId, userId];
   try {
     const { rows } = await db.query(query, values);
+    if (rows.length === 0) throw new Error('Task not found or user does not have permission to update this task');
     return rows[0];
   } catch (error) {
     const formattedError = formatError(error);

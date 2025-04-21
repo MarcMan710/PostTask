@@ -7,6 +7,7 @@ const TaskForm = ({ onSubmit, initialData = {}, isEditing = false }) => {
   const [title, setTitle] = useState(initialData.title || '')
   const [description, setDescription] = useState(initialData.description || '')
   const [dueDate, setDueDate] = useState(initialData.dueDate || '');
+  const [category, setCategory] = useState(initialData.category || '');
   const [priority, setPriority] = useState(initialData.priority || 'Medium');
 
   const handleSubmit = async (e) => {
@@ -14,7 +15,8 @@ const TaskForm = ({ onSubmit, initialData = {}, isEditing = false }) => {
     const formData = {
       title,
       description,
-      dueDate, 
+      dueDate,
+      category,
       priority
 
     };
@@ -23,6 +25,7 @@ const TaskForm = ({ onSubmit, initialData = {}, isEditing = false }) => {
       setTitle('');
       setDescription('');
       setDueDate('');
+      setCategory('');
     }
   };
 
@@ -36,6 +39,14 @@ const TaskForm = ({ onSubmit, initialData = {}, isEditing = false }) => {
         label="Due Date" 
         value={dueDate} 
         onChange={(e) => setDueDate(e.target.value)} 
+        required
+      />
+      <Input
+        type="text"
+        label="Category"
+        placeholder="e.g. Work, Personal"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
         required
       />
       <Select

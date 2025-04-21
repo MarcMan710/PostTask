@@ -29,12 +29,18 @@ const TaskCard = ({ task, onEdit, onDelete }) => {
           </span>
         </div>
         <p className="text-sm text-gray-600 mt-1">{task.description}</p>
+        <div className='flex items-center mt-1'>
+        {task.category && (
+          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
+            {task.category}
+          </span>
+        )}
         {task.dueDate && (
-          
           <p className="text-sm text-gray-500">
             Due: {new Date(task.dueDate).toLocaleDateString()}
           </p>
         )}
+        </div>
       </div>
       <div className="flex gap-2">
         <Button onClick={handleEdit} className="bg-blue-500 hover:bg-blue-600">Edit</Button>

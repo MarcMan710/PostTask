@@ -1,9 +1,9 @@
 const {
   getUserTasks,
   createTask,
-  getTaskById,
   deleteTask,
-} = require('../models/taskModel')
+  updateTask
+} = require('../models/taskModel');
 
 const getTasks = async (req, res, next) => {
   try {
@@ -14,19 +14,6 @@ const getTasks = async (req, res, next) => {
   }
 }
 
-const getTask = async (req, res, next) => {
-  const taskId = req.params.id
-  try {
-    const task = await getTaskById(taskId, req.user.id)
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' })
-    }
-    res.status(200).json(task)
-  } catch (err) {
-    next(err)
-  }
-
-}
 
 const createTaskHandler = async (req, res, next) => {
   const { title, description, dueDate, priority } = req.body
@@ -55,13 +42,7 @@ const updateTaskHandler = async (req, res, next) => {
   const { title, description, dueDate, priority, status } = req.body
 
   try {
-    const existingTask = await getTaskById(taskId, req.user.id)
-
-    if (!existingTask) {
-      return res.status(404).json({ message: 'Task not found' })
-    }
-
-    const updated = await updateTask(taskId, req.user.id, {
+    const updatedTask = await updateTask(taskId, req.user.id, {
       title,
       description,
       dueDate,
@@ -70,7 +51,7 @@ const updateTaskHandler = async (req, res, next) => {
       status,
     })
 
-    res.status(200).json(updated)
+    res.status(200).json(updatedTask)
   } catch (err) {
     next(err)
   }
@@ -80,12 +61,6 @@ const deleteTaskHandler = async (req, res, next) => {
   const taskId = req.params.id
 
   try {
-    const existingTask = await getTaskById(taskId, req.user.id)
-
-    if (!existingTask) {
-      return res.status(404).json({ message: 'Task not found' })
-    }
-
     await deleteTask(taskId)
     res.status(204).end()
   } catch (err) {
@@ -95,7 +70,6 @@ const deleteTaskHandler = async (req, res, next) => {
 
 module.exports = {
   getTasks,
-  getTask,
   createTask: createTaskHandler,
   updateTask: updateTaskHandler,
   deleteTask: deleteTaskHandler,
