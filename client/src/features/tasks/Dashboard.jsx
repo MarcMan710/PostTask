@@ -1,11 +1,22 @@
 import TaskBoard from './TaskBoard'
 import TaskFormModal from './TaskFormModal'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Button from '../../components/common/Button'
+import { useTasks } from '../../hooks/useTasks'
 
+const sortedTasks = (tasks) => {
+    const order = { High: 0, Medium: 1, Low: 2 };
+    return [...tasks].sort((a, b) => order[a.priority] - order[b.priority]);
+  };
+  
 const Dashboard = () => {
   const [selectedTask, setSelectedTask] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const { tasks, fetchTasks } = useTasks()
+
+  useEffect(() => {
+    fetchTasks()
+  }, [fetchTasks])
 
   const handleOpenModal = () => {
     setIsModalOpen(true)
@@ -17,10 +28,14 @@ const Dashboard = () => {
         <h1 className="text-2xl font-bold">My Tasks</h1>
         <Button onClick={handleOpenModal}>Add Task</Button>
       </div>
-      <TaskBoard onEdit={setSelectedTask} />
+      <TaskBoard onEdit={setSelectedTask} tasks={sortedTasks(tasks)} />
       <TaskFormModal task={selectedTask} setTask={setSelectedTask} isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
     </div>
   )
 }
 
 export default Dashboard
+
+
+
+  

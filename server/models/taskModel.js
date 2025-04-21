@@ -20,12 +20,13 @@ async function getUserTasks(userId) {
 
 // Create a new task
 async function createTask(task) {
-  const { title, description, dueDate, priority, userId } = task
+  const { title, description, dueDate, priority = 'Medium', userId } = task
   const query = `
     INSERT INTO tasks (title, description, due_date, priority, user_id)
     VALUES ($1, $2, $3, $4, $5) RETURNING *`
   const values = [title, description, dueDate, priority, userId]
   try {
+
     const { rows } = await db.query(query, values);
     return rows[0];
   } catch (error) {
@@ -36,8 +37,15 @@ async function createTask(task) {
 
 // Update task
 async function updateTask(taskId, updates) {
-  const { title, description, dueDate, priority, status } = updates
-  const query = `UPDATE tasks SET title = $1, description = $2, due_date = $3, priority = $4, status = $5 WHERE id = $6 RETURNING *`;
+  const { title, description, dueDate, priority, status, userId } = updates
+  const query = `
+  UPDATE tasks 
+  SET title = $1, description = $2, due_date = $3, priority = $4, status = $5 
+  WHERE id = $6 AND user_id = $7
+  RETURNING *
+  `;
+
+
   const values = [title, description, dueDate, priority, status, taskId];
   try {
     const { rows } = await db.query(query, values);
@@ -50,7 +58,7 @@ async function updateTask(taskId, updates) {
 
 // Delete task
 async function deleteTask(taskId) {
-  const query = `DELETE FROM tasks WHERE id = $1`;
+  const query = `DELETE FROM tasks WHERE id = $1 RETURNING *`;
   try {
     await db.query(query, [taskId]);
   } catch (error) {

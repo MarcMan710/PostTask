@@ -2,7 +2,6 @@ const {
   getUserTasks,
   createTask,
   getTaskById,
-  updateTask,
   deleteTask,
 } = require('../models/taskModel')
 
@@ -18,7 +17,7 @@ const getTasks = async (req, res, next) => {
 const getTask = async (req, res, next) => {
   const taskId = req.params.id
   try {
-    const task = await getTaskById(taskId)
+    const task = await getTaskById(taskId, req.user.id)
     if (!task) {
       return res.status(404).json({ message: 'Task not found' })
     }
@@ -56,17 +55,18 @@ const updateTaskHandler = async (req, res, next) => {
   const { title, description, dueDate, priority, status } = req.body
 
   try {
-    const existingTask = await getTaskById(taskId)
+    const existingTask = await getTaskById(taskId, req.user.id)
 
     if (!existingTask) {
       return res.status(404).json({ message: 'Task not found' })
     }
 
-    const updated = await updateTask(taskId, {
+    const updated = await updateTask(taskId, req.user.id, {
       title,
       description,
       dueDate,
       priority,
+      userId: req.user.id,
       status,
     })
 
@@ -80,7 +80,7 @@ const deleteTaskHandler = async (req, res, next) => {
   const taskId = req.params.id
 
   try {
-    const existingTask = await getTaskById(taskId)
+    const existingTask = await getTaskById(taskId, req.user.id)
 
     if (!existingTask) {
       return res.status(404).json({ message: 'Task not found' })
