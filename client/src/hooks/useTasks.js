@@ -13,8 +13,9 @@ const useTasks = () => {
 
   useEffect(() => {
     const loadTasks = async () => {
+      // setError(null) is called at the beginning of the effect's async function
       setLoading(true);
-      setError(null);
+      setError(null); // Explicitly clear error before new load attempt
       try {
         const data = await fetchTasks();
         setTasks(data);

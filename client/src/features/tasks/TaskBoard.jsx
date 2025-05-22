@@ -1,28 +1,26 @@
 import { useTasks } from '../../hooks/useTasks'
 import TaskList from '../../components/tasks/TaskList'
-import { useEffect } from 'react'
+// Removed useEffect as useTasks handles initial fetch
 
 const TaskBoard = ({ onEdit }) => {
-  const { tasks, loading, removeTask, fetchTasks } = useTasks()
+  // fetchTasks removed, error state accessed
+  const { tasks, loading, error, removeTask } = useTasks()
 
-  useEffect(() => {
-    fetchTasks()
-  }, [fetchTasks])
+  // useEffect calling fetchTasks removed - useTasks handles initial load.
 
   const handleEdit = (task) => {
     onEdit(task)
   }
 
+  // handleDelete now relies on useTasks's removeTask to handle errors
+  // and set the error state within the hook.
   const handleDelete = async (taskId) => {
-    try {
-      await removeTask(taskId)
-    } catch (error) {
-      console.error('Error deleting task:', error)
-    }
+    await removeTask(taskId)
+    // No local try-catch needed here, error will be set in useTasks
   }
 
   return (
-    <TaskList tasks={tasks} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
+    <TaskList tasks={tasks} loading={loading} error={error} onEdit={handleEdit} onDelete={handleDelete} />
   )
 }
 

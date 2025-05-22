@@ -1,19 +1,17 @@
 const { hashPassword, comparePassword } = require('../utils/hashPassword')
 const generateToken = require('../utils/generateToken')
-const validateEmail = require('../utils/validateEmail')
+// const validateEmail = require('../utils/validateEmail'); // Removed as per subtask
 const { createUser, findUserByEmail } = require('../models/userModel')
 
 const registerUser = async (req, res, next) => {
   const { email, password } = req.body
 
+  // Input validation (e.g., email format, password presence)
+  // is now handled by the 'validateRegister' middleware.
   try {
-    if (!email || !password) {
-      return res.status(400).json({ message: 'All fields are required' })
-    }
-
-    if (!validateEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email' })
-    }
+    // The 'validateRegister' middleware (checking email format, password length)
+    // would have already run and sent a 400 response if validation failed.
+    // Thus, manual checks for email format or presence are removed.
 
     const existingUser = await findUserByEmail(email)
     if (existingUser) {

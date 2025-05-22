@@ -2,10 +2,12 @@ import TaskCard from './TaskCard'
 import Spinner from '../common/Spinner'
 import { useState } from 'react'
 
-const TaskList = ({ tasks, loading, onEdit, onDelete }) => {
+const TaskList = ({ tasks, loading, error, onEdit, onDelete }) => {
   const [showCompleted, setShowCompleted] = useState(false)
 
   if (loading) return <Spinner />
+  // Display error message if an error occurred
+  if (error) return <p className="text-red-500">Error loading tasks: {error.message || 'Please try again.'}</p>
   if (!tasks.length) return <p>No tasks yet.</p>
 
   const filteredTasks = showCompleted ? tasks : tasks.filter(task => !task.completed)

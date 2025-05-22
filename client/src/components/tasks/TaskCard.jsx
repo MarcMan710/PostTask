@@ -1,13 +1,5 @@
-import Button from '../common/Button'
-
-const getPriorityColor = (priority) => {
-  switch (priority) {
-    case 'High': return 'bg-red-100 text-red-700'
-    case 'Medium': return 'bg-yellow-100 text-yellow-700'
-    case 'Low': return 'bg-green-100 text-green-700'
-    default: return 'bg-gray-100 text-gray-700'
-  }
-}
+import Button from '../common/Button';
+import { getPriorityColor } from '../../utils/styleUtils';
 
 const TaskCard = ({ task, onEdit, onDelete }) => {
   const priorityColor = getPriorityColor(task.priority);

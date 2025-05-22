@@ -12,18 +12,13 @@ const sortedTasks = (tasks) => {
 const Dashboard = () => {
   const [selectedTask, setSelectedTask] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { tasks, fetchTasks } = useTasks();
+  const { tasks } = useTasks(); // Removed fetchTasks, as useTasks handles initial fetch
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  useEffect(() => {
-    fetchTasks()
-  }, [fetchTasks])
+  // Removed redundant useEffect hooks calling fetchTasks.
+  // useTasks hook handles the initial data fetching.
 
   const categories = Array.from(new Set(tasks.map(task => task.category).filter(Boolean)));
-
-  useEffect(() => {
-    fetchTasks()
-  }, [fetchTasks])
 
   const handleOpenModal = () => {
     setIsModalOpen(true)

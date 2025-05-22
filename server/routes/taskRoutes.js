@@ -2,6 +2,10 @@ const express = require('express')
 const router = express.Router()
 const { protect } = require('../middleware/authMiddleware')
 const {
+  createTaskValidation,
+  updateTaskValidation,
+} = require('../middleware/validationMiddleware');
+const {
   getTasks,
   createTask,
   updateTask,
@@ -14,10 +18,10 @@ router.use(protect);
 
 router.route('/')
   .get(getTasks)
-  .post(createTask);
+  .post(createTaskValidation, createTask);
 router.route('/:id')
   .get(getTask)
-  .put(updateTask)
+  .put(updateTaskValidation, updateTask)
   .delete(deleteTask);
 
 module.exports = router

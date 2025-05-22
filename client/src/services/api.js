@@ -15,4 +15,16 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.data && error.response.data.message) {
+      console.error('API Error:', error.response.data.message);
+    } else {
+      console.error('An unexpected error occurred.');
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default API
